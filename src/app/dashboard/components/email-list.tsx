@@ -1,8 +1,7 @@
 "use client";
 
-import React, { ComponentProps, useEffect, useState } from "react";
+import React, { ComponentProps, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardHeader,
@@ -10,19 +9,18 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuSeparator,
-  DropdownMenuCheckboxItem,
-} from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ListFilter, BotMessageSquare } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/components/ui/use-toast";
+
+import ClassifyButton from "./classify-button";
+import { signOut } from "next-auth/react";
+import MailCountDropdown from "./mail-count-dropdown";
+import { useRouter, useSearchParams } from "next/navigation";
+import DetailsDrawer from "./details-drawer";
+import EmptyInbox from "./empty-inbox";
 
 interface Email {
   id: string;
@@ -41,7 +39,19 @@ interface EmailListProps {
 }
 
 const EmailList: React.FC<EmailListProps> = ({ emails, error }) => {
-  const [selected, setSelected] = useState<string | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const newParams = new URLSearchParams(searchParams.toString());
+
+  const [selected, setSelected] = React.useState(
+    newParams.get("selected_mail") || null
+  );
+
+  const handleSelecting = (item: string) => {
+    setSelected(item);
+    newParams.set("selected_mail", item);
+    router.push(`/dashboard?${newParams.toString()}`);
+  };
 
   if (error) {
     toast({
@@ -49,6 +59,10 @@ const EmailList: React.FC<EmailListProps> = ({ emails, error }) => {
       description: error || "Unexpected error",
       variant: "destructive",
     });
+
+    if (error === "Invalid Credentials") {
+      signOut();
+    }
   }
 
   const categories = {
@@ -56,44 +70,32 @@ const EmailList: React.FC<EmailListProps> = ({ emails, error }) => {
     important: emails?.filter((email) => email.category === "important"),
     spam: emails?.filter((email) => email.category === "spam"),
     marketing: emails?.filter((email) => email.category === "marketing"),
+    promotions: emails?.filter((email) => email.category === "promotions"),
+    social: emails?.filter((email) => email.category === "social"),
+    general: emails?.filter((email) => email.category === "general"),
   };
+
+  const details_data =
+    newParams.get("selected_mail") && emails?.find((x) => x.id === selected);
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 h-full">
+      <DetailsDrawer details_data={details_data as any} />
       <Tabs defaultValue="all">
         <div className="flex items-center">
           <TabsList>
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="important">Important</TabsTrigger>
+            <TabsTrigger value="general">General</TabsTrigger>
+            <TabsTrigger value="social">Social</TabsTrigger>
+            <TabsTrigger value="marketing">Marketing</TabsTrigger>
+            <TabsTrigger value="promotions">Promotions</TabsTrigger>
             <TabsTrigger value="spam">Spam</TabsTrigger>
-            <TabsTrigger value="marketing" className="hidden sm:flex">
-              Marketing
-            </TabsTrigger>
           </TabsList>
           <div className="ml-auto flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-7 gap-1">
-                  <ListFilter className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    No. Mails
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem checked>15</DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem>20</DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem>25</DropdownMenuCheckboxItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <MailCountDropdown />
 
-            <Button size="sm" className="h-7 gap-1 animate-pulse">
-              <BotMessageSquare className="h-3.5 w-3.5" />
-              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                Classify
-              </span>
-            </Button>
+            <ClassifyButton />
           </div>
         </div>
 
@@ -105,6 +107,11 @@ const EmailList: React.FC<EmailListProps> = ({ emails, error }) => {
               </CardHeader>
               <CardContent>
                 <ScrollArea className="h-[60vh]">
+                  {emails?.length === 0 && (
+                    <div className="h-full">
+                      <EmptyInbox />
+                    </div>
+                  )}
                   <div className="flex flex-col gap-2 p-4 pt-0">
                     {emails?.map((item) => (
                       <button
@@ -113,7 +120,7 @@ const EmailList: React.FC<EmailListProps> = ({ emails, error }) => {
                           "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
                           selected === item.id && "bg-muted"
                         )}
-                        onClick={() => setSelected(item.id)}
+                        onClick={() => handleSelecting(item.id)}
                       >
                         <div className="flex w-full flex-col gap-1">
                           <div className="flex items-center">
@@ -162,8 +169,8 @@ const EmailList: React.FC<EmailListProps> = ({ emails, error }) => {
               </CardContent>
               <CardFooter>
                 <div className="text-xs text-muted-foreground">
-                  Showing <strong>1-10</strong> of{" "}
-                  <strong>{emails?.length}</strong> emails
+                  Showing <strong>1-{emails?.length}</strong> of{" "}
+                  <strong>{categories.all?.length}</strong> emails
                 </div>
               </CardFooter>
             </Card>

@@ -1,16 +1,21 @@
 "use client";
 
+import ResizableIcon from "@/app/components/icon";
+import ResizableLoader from "@/app/components/loader";
 import { Button } from "@/components/ui/button";
 import { signIn, useSession } from "next-auth/react";
 import React from "react";
 
 export default function ClientLoginPage() {
-    
   return (
     <>
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 px-4">
-        <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold">Welcome to <span className="text-primary">InBox Genie!</span></h1>
+        <div className="space-y-2 text-center flex flex-col justify-center items-center">
+          <ResizableIcon />
+          <ResizableLoader/>
+          <h1 className="text-3xl font-bold">
+            Welcome to <span className="text-primary">InBox Genie!</span>
+          </h1>
           <p className="text-gray-500">
             Sign in with your Google account to get started.
           </p>

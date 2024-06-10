@@ -1,5 +1,4 @@
 import { getServerSession } from "next-auth";
-import styles from "./page.module.css";
 import { authOptions } from "@/lib/auth";
 
 export default async function Home() {

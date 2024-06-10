@@ -7,8 +7,6 @@ import { authOptions } from "@/lib/auth";
 export default async function Page() {
   const session = await getServerSession(authOptions);
 
-  console.log(session?.accessToken, "ACCESS TOKEN FROM SIGNIN");
-
   if (session?.accessToken) {
     redirect("/dashboard");
   }

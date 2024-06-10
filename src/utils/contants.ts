@@ -1,0 +1,1 @@
+export const openai_localstorage_key = "openai-access-token";

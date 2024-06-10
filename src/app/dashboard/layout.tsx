@@ -11,12 +11,11 @@ export default async function RootLayout({
 }>) {
   const session = await getServerSession(authOptions);
 
-  console.log(session, "ACCESS TOKEN FROM DASHBOARD");
-
   if (!session || !session?.accessToken) {
     signOut();
     redirect("/signin");
   }
+
 
   return (
     <>
