@@ -1,9 +1,8 @@
-import NextAuth from 'next-auth';
-import { authOptions } from './app/api/auth/[...nextauth]/route';
- 
-export default NextAuth(authOptions).auth;
- 
+export { default } from "next-auth/middleware";
+
 export const config = {
-  // https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
-  matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
+  matcher: [
+    "/protected",
+    "/protected/:path*", //use this to protect all child routes of '/protected'
+  ],
 };
