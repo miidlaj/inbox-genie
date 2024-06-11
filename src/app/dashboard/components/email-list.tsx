@@ -152,6 +152,10 @@ const EmailList: React.FC<EmailListProps> = ({ emails, error }) => {
                         </div>
                         {item.labelIds.length ? (
                           <div className="flex items-center gap-2">
+                            {item.category !== "all" && (
+                              <Badge>{item.category}</Badge>
+                            )}
+
                             {item.labelIds.map((label) => (
                               <Badge
                                 key={label}

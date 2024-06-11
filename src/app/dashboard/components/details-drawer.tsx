@@ -110,7 +110,7 @@ export default function DetailsDrawer({
                 <Link href={details_data?.link || "/"} target="_blank">
                   <Button size="sm" variant="link" className="h-8 gap-1">
                     <GmailIcon />
-                    <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap text-white">
+                    <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">
                       View in Gmail
                     </span>
                   </Button>
@@ -132,7 +132,8 @@ export default function DetailsDrawer({
                 </DropdownMenu>
               </div>
             </CardHeader>
-            <CardContent className="p-6 text-sm h-full min-h-[70vh]">
+            <CardContent className="p-6 text-sm h-full min-h-[66.3
+            vh]">
               <div className="grid gap-3">
                 <div className="font-semibold underline">Email Details</div>
                 <ul className="grid gap-3">
@@ -149,12 +150,22 @@ export default function DetailsDrawer({
               </div>
             </CardContent>
             <CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">
-              <div className="text-xs text-muted-foreground">
-                Updated{" "}
-                <time>
-                  {details_data && format(details_data?.recieved, "PPP")}
-                </time>
-              </div>
+              {details_data?.labelIds.length ? (
+                <div className="flex items-center gap-2">
+                  {details_data?.category !== "all" && (
+                    <Badge>{details_data?.category}</Badge>
+                  )}
+
+                  {details_data?.labelIds.map((label) => (
+                    <Badge
+                      key={label}
+                      variant={"outline"}
+                    >
+                      {label.replace("_", " ")}
+                    </Badge>
+                  ))}
+                </div>
+              ) : null}
             </CardFooter>
           </Card>
         </ScrollArea>
