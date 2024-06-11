@@ -13,13 +13,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React from "react";
 
 export default function MailCountDropdown() {
-
   const router = useRouter();
   const searchParams = useSearchParams();
   const newParams = new URLSearchParams(searchParams.toString());
 
-  const [selected, setSelected] = React.useState(newParams.get("mail_count") || "15");
-
+  const [selected, setSelected] = React.useState(
+    newParams.get("mail_count") || "15"
+  );
 
   const handleSelecting = (item: string) => {
     setSelected(item);
@@ -30,8 +30,8 @@ export default function MailCountDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="h-7 gap-1">
-          <div className="h-3.5 w-3.5" >{selected}</div>
+        <Button variant="outline" size="sm" className="h-7 gap-1 items-center">
+          <div className="h-3.5 w-3.5">{selected}</div>
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
             No. Mails
           </span>

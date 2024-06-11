@@ -69,7 +69,7 @@ export async function fetchEmails(
 
     const response = await gmail.users.messages.list({
       userId: "me",
-      maxResults: mail_count,
+      maxResults: mail_count <= 25 ? mail_count : 15,
     });
 
     if (!response.data.messages) {

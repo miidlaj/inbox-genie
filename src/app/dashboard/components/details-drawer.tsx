@@ -1,5 +1,6 @@
 "use client";
 
+import ResizableIcon from "@/app/components/icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -132,10 +133,22 @@ export default function DetailsDrawer({
                 </DropdownMenu>
               </div>
             </CardHeader>
-            <CardContent className="p-6 text-sm h-full min-h-[66.3
-            vh]">
+            <CardContent className="p-6 text-sm h-full min-h-[66.3vh]">
               <div className="grid gap-3">
-                <div className="font-semibold underline">Email Details</div>
+                {details_data?.category === "all" ? (
+                  <div className="font-semibold underline">Email Details</div>
+                ) : (
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold underline">
+                      Classified as:
+                    </span>{" "}
+                    <Badge>
+                      <ResizableIcon className="h-6 w-6" />
+                      {details_data?.category.toUpperCase()}
+                    </Badge>
+                  </div>
+                )}
+
                 <ul className="grid gap-3">
                   <li className="flex items-center justify-between">
                     <span className="text-muted-foreground text-lg">
@@ -153,14 +166,11 @@ export default function DetailsDrawer({
               {details_data?.labelIds.length ? (
                 <div className="flex items-center gap-2">
                   {details_data?.category !== "all" && (
-                    <Badge>{details_data?.category}</Badge>
+                    <Badge>{details_data?.category.toUpperCase()}</Badge>
                   )}
 
                   {details_data?.labelIds.map((label) => (
-                    <Badge
-                      key={label}
-                      variant={"outline"}
-                    >
+                    <Badge key={label} variant={"outline"}>
                       {label.replace("_", " ")}
                     </Badge>
                   ))}

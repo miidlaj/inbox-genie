@@ -7,6 +7,7 @@ import React from "react";
 
 export default function ClientLoginPage() {
 
+
   return (
     <>
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 px-4">

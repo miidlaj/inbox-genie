@@ -153,7 +153,7 @@ const EmailList: React.FC<EmailListProps> = ({ emails, error }) => {
                         {item.labelIds.length ? (
                           <div className="flex items-center gap-2">
                             {item.category !== "all" && (
-                              <Badge>{item.category}</Badge>
+                              <Badge>{item?.category.toUpperCase()}</Badge>
                             )}
 
                             {item.labelIds.map((label) => (
