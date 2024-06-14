@@ -16,7 +16,7 @@ import { BotMessageSquare, Key, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { openai_localstorage_key } from "@/utils/contants";
-import ResizableIcon from "@/app/(components)/icon";
+import ResizableIcon from "@/components/icon";
 
 export default function ClassifyButton() {
   const [openApiKeyModal, setOpenApiKeyModal] = React.useState<boolean>(false);

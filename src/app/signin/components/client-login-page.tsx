@@ -1,6 +1,6 @@
 "use client";
 
-import ResizableIcon from "@/app/(components)/icon";
+import ResizableIcon from "@/components/icon";
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
 import React from "react";

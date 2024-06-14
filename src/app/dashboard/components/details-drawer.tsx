@@ -1,6 +1,6 @@
 "use client";
 
-import ResizableIcon from "@/app/(components)/icon";
+import ResizableIcon from "@/components/icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {

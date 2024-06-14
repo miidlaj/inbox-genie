@@ -9,7 +9,7 @@ import { LayoutDashboard, Settings } from "lucide-react";
 import { getServerSession } from "next-auth";
 import { signOut } from "next-auth/react";
 import { redirect } from "next/navigation";
-import ResizableIcon from "../(components)/icon";
+import ResizableIcon from "../../components/icon";
 import Link from "next/link";
 
 export default async function RootLayout({
