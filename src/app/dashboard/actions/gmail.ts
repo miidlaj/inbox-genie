@@ -1,8 +1,9 @@
 "use server";
 
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { google } from "googleapis";
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import OpenAI from "openai";
 
 interface Email {
@@ -21,24 +22,36 @@ interface FetchEmailsResult {
   data: Email[] | null;
 }
 
-export async function fetchEmails(): Promise<FetchEmailsResult> {
+export const fetchData = async (
+  classify = false,
+  mail_count = 15
+): Promise<FetchEmailsResult> => {
+  if (classify) {
+    const email_res = await fetchEmails(mail_count);
+    if (!email_res.data) {
+      return email_res;
+    } else {
+      const class_res = await classifyEmailsTest(email_res.data);
+      if (class_res) {
+        return {
+          data: class_res,
+          error: null,
+        };
+      } else {
+        return {
+          data: email_res.data,
+          error: "Cannot classify emails",
+        };
+      }
+    }
+  } else {
+    return await fetchEmails(mail_count);
+  }
+};
 
-  // classifyEmails([
-  //   {
-  //     id: "18ffc1199abd8441",
-  //     snippet:
-  //       "Infoorigin Inc is hiring Glassdoor Jobs Your daily job listings for 9 June 2024 Software Engineer Nāgpur, Maharashtra AMEC Technology Private Limited Backend Developer India Easy Apply Virtual Galaxy",
-  //     subject:
-  //       "Dot Net Developer at Infoorigin Inc and 9 more jobs in Nāgpur, Maharashtra for you. Apply Now.",
-  //     link: "https://mail.google.com/mail/u/0/#inbox/18ffc1199abd8441",
-  //     labelIds: ["UNREAD"],
-  //     from: "Glassdoor Jobs ",
-  //     category: "all",
-  //     recieved: "Sun, 09 Jun 2024 08:16:02 +0000 (UTC)",
-  //   },
-  // ]);
-
-
+export async function fetchEmails(
+  mail_count: number
+): Promise<FetchEmailsResult> {
   try {
     const auth = new google.auth.OAuth2();
 
@@ -56,7 +69,7 @@ export async function fetchEmails(): Promise<FetchEmailsResult> {
 
     const response = await gmail.users.messages.list({
       userId: "me",
-      maxResults: 15,
+      maxResults: mail_count <= 25 ? mail_count : 15,
     });
 
     if (!response.data.messages) {
@@ -94,7 +107,6 @@ export async function fetchEmails(): Promise<FetchEmailsResult> {
     const validMessages = messages.filter((msg): msg is Email => msg !== null);
 
     if (validMessages.length > 0) {
-      
       return { error: null, data: validMessages };
     } else {
       return { error: "Cannot parse email data", data: null };
@@ -106,6 +118,34 @@ export async function fetchEmails(): Promise<FetchEmailsResult> {
     };
   }
 }
+
+const classifyEmailsTest = async (emails: Email[]) => {
+  try {
+    const categories = [
+      "important",
+      "promotions",
+      "social",
+      "marketing",
+      "spam",
+      "general",
+    ];
+
+    const updatedEmails = await Promise.all(
+      emails.map(async (email) => {
+        const randomCategory =
+          categories[Math.floor(Math.random() * categories.length)];
+
+        return {
+          ...email,
+          category: randomCategory,
+        };
+      })
+    );
+    return updatedEmails;
+  } catch (error) {
+    console.error("Error classifying emails:", error);
+  }
+};
 
 const classifyEmails = async (emails: Email[]) => {
   try {
@@ -152,8 +192,6 @@ const classifyEmails = async (emails: Email[]) => {
         };
       })
     );
-
-    console.log(updatedEmails);
   } catch (error) {
     console.error("Error classifying emails:", error);
   }
