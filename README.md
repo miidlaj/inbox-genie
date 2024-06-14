@@ -1,2 +1,2 @@
 
-Open [https://inboxgenie.vercel.app](Inbox Genie) with your browser to see the result.
+Open [https://inboxgenie.vercel.app](InboxGenie) with your browser to see the result.
