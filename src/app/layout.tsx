@@ -35,6 +35,7 @@ export default async function RootLayout({
           fontSans.variable
         )}
       >
+
         <ThemeProvider attribute="class" defaultTheme="system">
           <SessionProvider session={session}>
             <TooltipProvider>{children}</TooltipProvider>
