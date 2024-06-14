@@ -1,4 +1,4 @@
-import ResizableIcon from "@/app/components/icon";
+import ResizableIcon from "@/app/(components)/icon";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import React from "react";

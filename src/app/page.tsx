@@ -2,7 +2,7 @@
 import { HeroParallax } from "@/components/ui/hero-parallax";
 import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
 import React from "react";
-import ResizableIcon from "./components/icon";
+import ResizableIcon from "./(components)/icon";
 import Link from "next/link";
 
 export default function Page() {
