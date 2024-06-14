@@ -25,7 +25,7 @@ export default function Page() {
     </div>
   );
 }
-export const products = [
+const products = [
   {
     title: "Dashboard",
     link: "https://inboxgenie.vercel.app/dashboard",
