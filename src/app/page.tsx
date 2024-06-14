@@ -9,7 +9,7 @@ export default function Page() {
   return (
     <div className="relative">
       <div className="absolute top-4 right-4">
-        <Link href={"/dashboard"}>
+        <Link href={"/signin"}>
           <HoverBorderGradient
             containerClassName="rounded-full"
             as="button"
