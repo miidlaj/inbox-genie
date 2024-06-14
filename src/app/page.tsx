@@ -5,7 +5,7 @@ import React from "react";
 import ResizableIcon from "./components/icon";
 import Link from "next/link";
 
-export default function HeroParallaxDemo() {
+export default function Page() {
   return (
     <div className="relative">
       <div className="absolute top-4 right-4">

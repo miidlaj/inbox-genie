@@ -6,6 +6,9 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import OpenAI from "openai";
 
+import { createOpenAI } from "@ai-sdk/openai";
+import { generateText } from "ai";
+
 interface Email {
   id: string;
   snippet: string;
@@ -24,14 +27,15 @@ interface FetchEmailsResult {
 
 export const fetchData = async (
   classify = false,
+  api_key: string | undefined,
   mail_count = 15
 ): Promise<FetchEmailsResult> => {
-  if (classify) {
+  if (classify && api_key) {
     const email_res = await fetchEmails(mail_count);
     if (!email_res.data) {
       return email_res;
     } else {
-      const class_res = await classifyEmailsTest(email_res.data);
+      const class_res = await classifyEmailsTest(email_res.data, api_key);
       if (class_res) {
         return {
           data: class_res,
@@ -103,9 +107,7 @@ export async function fetchEmails(
         return null;
       })
     );
-
     const validMessages = messages.filter((msg): msg is Email => msg !== null);
-
     if (validMessages.length > 0) {
       return { error: null, data: validMessages };
     } else {
@@ -119,7 +121,7 @@ export async function fetchEmails(
   }
 }
 
-const classifyEmailsTest = async (emails: Email[]) => {
+const classifyEmailsTest = async (emails: Email[], api_key: string) => {
   try {
     const categories = [
       "important",
@@ -147,12 +149,10 @@ const classifyEmailsTest = async (emails: Email[]) => {
   }
 };
 
-const classifyEmails = async (emails: Email[]) => {
+const classifyEmails = async (emails: Email[], api_key: string) => {
   try {
     const openai = new OpenAI({
-      apiKey:
-        process.env["OPENAI_API_KEY"] ||
-        "sk-proj-UaOY5GZuM42zO7A6xgbCT3BlbkFJWeWhsODmNmDvmqNzrJMV",
+      apiKey: api_key,
     });
 
     const updatedEmails = await Promise.all(
@@ -195,4 +195,45 @@ const classifyEmails = async (emails: Email[]) => {
   } catch (error) {
     console.error("Error classifying emails:", error);
   }
+};
+
+export const vercel_sdk = async (emails: Email[], api_key: string) => {
+  const openai = createOpenAI({
+    apiKey: api_key,
+  });
+
+  const updatedEmails = await Promise.all(
+    emails.map(async (email) => {
+      try {
+        const response = await generateText({
+          model: openai("gpt-3.5-turbo"),
+          prompt: `You are a helpful assistant that classifies emails into the following categories:
+          - important: Emails that are personal or work-related and require immediate attention.
+          - promotions: Emails related to sales, discounts, and marketing campaigns.
+          - social: Emails from social networks, friends, and family.
+          - marketing: Emails related to marketing, newsletters, and notifications.
+          - spam: Unwanted or unsolicited emails.
+          - general: If none of the above are matched, use General.
+          Please respond only with the exact category in lowercase.
+          
+          Classify this email:
+          Subject: ${email.subject}
+          Snippet: ${email.snippet}
+          From: ${email.from}`,
+        });
+
+        const classification = response.text.trim();
+
+        return {
+          ...email,
+          category: classification,
+        };
+      } catch (error) {
+        console.error("Error classifying email:", error);
+        return email;
+      }
+    })
+  );
+
+  return updatedEmails;
 };

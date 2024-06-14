@@ -33,7 +33,7 @@ export default function ClassifyButton() {
 
     if (openai_access_token) {
       setOpenApiKeyModal(false);
-      newParams.set("classify", "true");
+      newParams.set("classify", openai_access_token);
       router.push(`/dashboard?${newParams.toString()}`);
     } else {
       setNewApiKey(openai_access_token || "");
